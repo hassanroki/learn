@@ -1,0 +1,218 @@
+Laravel Query Builder Details:
+==============================
+1. All Users Get:
+$users = DB::table('users')->get();
+
+2. Specific Single Data Get Using Where:
+$users = DB::table('users')
+        ->where('id', 1)->first();
+
+3. Specific Column Data get Using Select:
+$users = DB::table('users')
+        ->select('name', 'email')->get();
+
+
+4. All Matching Data Get Using Like:
+ $users = DB::table('users')
+        ->where('name', 'like', '%a%')->get();
+
+
+5. Only One Data gets used using Find:
+$users = DB::table('users')
+        ->find(1);
+
+
+6. Table First Data Get Using First:
+$users = DB::table('users')
+        ->first();
+
+7. Inner Join:
+$users = DB::table('users')
+            ->join('roles', 'users.role_id', '=', 'roles.id')
+            ->select('users.name', 'users.email', 'roles.name as role_name')
+            ->get();
+
+8. Left Join-> left table er sob data dekhabe r right table theke matching data dekhabe:
+$users = DB::table('roles')->leftJoin('users', 'users.role_id', '=', 'roles.id')
+            ->select('users.name', 'users.email', 'roles.name as role_name')
+            ->get();
+
+9. Right Join-> Right Table theke sob data niye ashbe r Left Table theke only matching data gula anbe
+$users = DB::table('roles')->rightJoin('users', 'users.role_id', '=', 'roles.id')
+            ->select('users.name', 'users.email', 'roles.name as role_name')
+            ->get();
+
+
+10. Table Total Raw Count:
+ $waiverCount = DB::table('waiver_type_child')
+            ->count();
+
+11. Total Amount Using Sum:
+$totalWaiverAmount = DB::table('waiver_type_child')
+            ->sum('waiver_amount');
+
+11.1: Two Column Multi Then Total Sum:
+$delete = DB::table('products')
+        ->sum(DB::raw('price * stock'));
+
+
+12. Minimum Amount:
+$totalWaiverAmount = DB::table('waiver_type_child')
+            ->min('waiver_amount');
+
+
+13. Maximum Amount:
+$totalWaiverAmount = DB::table('waiver_type_child')
+            ->max('waiver_amount');
+Alternate -> varchar hole:
+$totalWaiverAmount = DB::table('waiver_type_child')
+            ->selectRaw('MAX(CAST(waiver_amount AS DECIMAL(10,2))) AS min_amount')
+            ->value('min_amount');
+
+14. Average Amount:
+$totalWaiverAmount = DB::table('waiver_type_child')
+            ->avg('waiver_amount');
+
+15. Where -> 40 beshi jar id, tader data dekhao:
+$totalWaiverAmount = DB::table('users')
+            ->where('id', '>', 40)
+            ->get();
+
+16. whereIn-> specific 2,3 ta ba tar beshi data dekhao:
+        $totalWaiverAmount = DB::table('users')
+            ->whereIn('id', [5, 6, 7])
+            ->get();
+
+17. whereBetween-> 1-5 ta data dekhao:
+$totalWaiverAmount = DB::table('users')
+            ->whereBetween('id', [5, 7])
+            ->get();
+
+18. whereNull-> Only null data gula dekhao:
+$totalWaiverAmount = DB::table('users')
+            ->whereNull('created_at')
+            ->get();
+
+19. WhereNotNull->null sara data gula dekhao:
+ $totalWaiverAmount = DB::table('users')
+            ->whereNotNull('created_at')
+            ->get();
+
+20. Search Filter:
+$name = $request->query('name');
+        $year = $request->query('year');
+        $search = DB::table('students')
+            ->when($name, function ($q) use($name) {
+                return $q->where('name', 'like', '%'.$name.'%');
+            })->when($year, function ($q) use($year) {
+                return $q->where('year', '=', $year);
+            })
+            ->get();
+        return $search;
+
+
+21. GroupBY->একই ধরনের মানগুলো একসাথে গ্রুপ করে ফেলা:
+$users = DB::table('waiver_type_child')
+        ->groupBy('fee_type_id')
+        ->select('fee_type_id', DB::raw('Count(*) as FeeTypeCount' ))
+        ->get();
+
+
+22. orderBy->asc/desc:
+$users = DB::table('users')
+        ->orderBy('id','desc')
+        ->get();
+
+23. Limit:
+ $users = DB::table('users')
+        ->limit(3)
+        ->get();
+
+
+24. Skip, Take:
+$users = DB::table('users')
+        ->skip(5) // Skip first 5 data
+        ->take(10) // Next 10 Data show
+        ->get();
+
+25. Paginate:
+$users = DB::table('users')
+        ->paginate(5);
+
+26. Insert:
+$userCreate = DB::table('users')
+        ->insert([
+            'name' => 'Tom',
+            'email' => 'tom@gmail.com',
+            'role_id' => 1,
+            'quantity' => 1,
+        ]);
+
+27. Update:
+ $userCreate = DB::table('users')
+        ->where('id', 4)
+        ->update([
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+28. Increment:
+$userCreate = DB::table('users')
+        ->where('id', 4)
+        // ->increment('quantity'); // default 1 increment
+        ->increment('quantity', 3);
+
+29. Decrement
+$userCreate = DB::table('users')
+        ->where('id', 4)
+        // ->decrement('quantity'); // default 1 decrement
+        ->decrement('quantity', 2);
+
+30. Use of Upsert in Query Builder->first insert korbe, then email same hole other column update korbe:
+$userCreate = DB::table('users')
+        ->upsert([
+            'name' => "MR Tom",
+            'email' => 'tom@gmail.com',
+            'role_id' => 2,
+        ], ['email'], ['name', 'role_id']);
+
+31. Delete:
+$delete = DB::table('users')
+        ->where('id', 5)
+        ->delete();
+
+32. Union->Two Table All Name Show Without Duplicate:
+$query1 = DB::table('users')->select('name');
+        $query2 = DB::table('customers')->select('name');
+
+        $results = $query1->union($query2)->get();
+
+33. Union->Two Table All Name Show With Duplicate:
+$query1 = DB::table('users')->select('name');
+        $query2 = DB::table('customers')->select('name');
+
+        $results = $query1->unionAll($query2)->get();
+
+34. Latest->News Data:
+$latestData = DB::table('users')->latest()->get();
+
+35. Oldest->Old Data:
+$data = DB::table('users')->oldest()->get();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
