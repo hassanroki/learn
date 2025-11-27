@@ -1,0 +1,91 @@
+0) Prerequisites — আগে চেক করুন:
+---------------------------------
+php -v        # PHP >= 8.2 চেক করুন
+composer -V
+node -v       # Node >= 20 (Tailwind v4 upgrade tool এর জন্য) 
+npm -v
+
+
+
+
+
+1) নতুন Laravel 12 প্রোজেক্ট তৈরি:
+------------------------------
+# Option A:
+composer create-project Laravel/Laravel convocation
+
+# Option B:
+composer create-project --prefer-dist laravel/laravel convocation "^12.0"
+
+# অথবা যদি Laravel installer ইনস্টল করে থাকেন:
+laravel new convocation
+
+
+ভেতরে প্রবেশ:
+cd myapp
+cp .env.example .env
+php artisan key:generate
+
+
+2) .env এ DB/APP সেট করুন, এরপর migrate:
+-----------------------------------------
+.env ফাইলে DB কনফিগ আপডেট করুন (MySQL/Postgres ইত্যাদি)। এরপর:
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=convocation
+DB_USERNAME=root
+DB_PASSWORD=
+
+Then, Command: php artisan migrate
+
+
+
+
+3) Laravel Breeze ইনস্টল (Auth scaffolding):
+--------------------------------------------
+composer require laravel/breeze --dev
+
+# interactive:
+php artisan breeze:install
+
+# অথবা সরাসরি Blade stack ইনস্টল করতে (supported):
+php artisan breeze:install blade
+
+# যদি আপনি React/Vue Inertia চান:
+# php artisan breeze:install react
+# php artisan breeze:install vue
+
+Then, Command: php artisan migrate
+
+
+4) Node deps ইনস্টল ও Tailwind CSS v4 সেটআপ:
+---------------------------------------------
+A. যদি Breeze ইতোমধ্যে Tailwind + app.css যোগ করে থাকে: সাধারণত Breeze তার resources/css/app.css এ Tailwind import যোগ করে — তবুও নীচের ধাপগুলো চালান:
+
+# Node deps (package.json অনুযায়ী)
+npm install
+
+# যদি Tailwind v4 explicitly ইনস্টল করতে চান:
+npm install --save-dev tailwindcss @tailwindcss/vite postcss autoprefixer
+# (বা কেবল) npm install tailwindcss @tailwindcss/vite
+
+
+
+D. dev server চালান
+npm run dev
+# production build:
+npm run build
+
+
+E. Tailwind Upgrade:
+npx @tailwindcss/upgrade
+
+
+
+5) শেষ স্টেপ: সার্ভার চালানো ও ভিউ চেক করা:
+---------------------------------------
+# নিচের দুটো একসাথে চালান (dev asset hot reload চালু থাকবে)
+npm run dev
+php artisan serve
+
