@@ -1,0 +1,249 @@
+Laravel Authentication, Authorization, and Middleware Implementation
+====================================================================
+
+
+1. Create New Project:
+Command: composer global require laravel/installer
+Then, Command: laravel new auth_middleware
+
+
+2. Make Model, Migration and Controller:
+---------------------------------------
+Command: php artisan make:model CustomUser -mc
+
+2. A) Edit>Database>migrations>2025_12_06_122437_create_custom_users_table.php:
+Schema::create('custom_users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
+Then, Command: php artisan migrate
+
+
+2. B) Edit>app>Model>CutomUser.php:
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class CustomUser extends Model
+{
+    protected $table = 'custom_users';
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'is_active',
+    ];
+
+    protected $hidden = [
+        'password',
+    ];
+}
+
+
+
+
+
+2. C) Edit app>http>controller>CustomUserController.php:
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\CustomUser;
+use Illuminate\Http\Request;
+
+class CustomUserController extends Controller
+{
+    // Login
+    public function login()
+    {
+        return view('custom_auth.login');
+    }
+    public function loginSubmit(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
+
+        $user = CustomUser::where('email', $request->email)
+            ->where('password', $request->password)
+            ->where('is_active', true)
+            ->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'Invalid email or password');
+        }
+
+        session(['custom_user_id' => $user->id]);
+
+        return redirect()->route('custom_auth.dashboard');
+    }
+    public function dashboard()
+    {
+        return view('custom_auth.dashboard');
+    }
+}
+
+
+
+
+3. Create Middleware:
+Command: php artisan make:middleware CustomMiddleware
+Edit app>http>middleware>CustomMiddleware.php:
+
+    public function handle(Request $request, Closure $next): Response
+    {
+         // Check Session for custom_user_id
+        if(!$request->session()->has('custom_user_id')){
+            return redirect()->route('login');
+        }
+
+        // Login User
+        return $next($request);
+    }
+
+
+
+# Import:
+---------
+Edit>bootstrap>app.php:
+  ->withMiddleware(function (Middleware $middleware): void {
+        // $middleware->validateCsrfTokens(except: ['*']);
+        $middleware->alias([
+            'custom.auth' => CustomMiddleware::class,
+        ]);
+    })
+
+
+
+
+
+4. Create Blade:
+----------------
+4. A) Edit>resources>views>cutom_auth>login.blade.php:
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>{{ config('app.name', 'Dashboard') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+
+        <!-- Styles / Scripts -->
+        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @else
+            <style>
+            </style>
+        @endif
+    </head>
+    <body>
+        <h1 class="text-center text-5xl font-bold">Welcome to the dashboard</h1>
+
+    <div class="m-auto items-center justify-center flex min-h-screen">
+        <calendar-date class="cally bg-base-100 border border-base-300 shadow-lg rounded-box">
+            <svg aria-label="Previous" class="fill-current size-4" slot="previous" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24">
+                <path fill="currentColor" d="M15.75 19.5 8.25 12l7.5-7.5"></path>
+            </svg>
+            <svg aria-label="Next" class="fill-current size-4" slot="next" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24">
+                <path fill="currentColor" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+            </svg>
+            <calendar-month></calendar-month>
+        </calendar-date>
+    </div>
+    <script type="module" src="https://unpkg.com/cally"></script>
+    </body>
+</html>
+
+
+
+4. B) Edit>resources>views>cutom_auth>dashboard.blade.php:
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>{{ config('app.name', 'Login') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+
+        <!-- Styles / Scripts -->
+        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @else
+            <style>
+            </style>
+        @endif
+    </head>
+    <body>
+          <div class="hero bg-base-200 min-h-screen">
+        <div class="hero-content flex-col lg:flex-row-reverse">
+          <div class="text-center lg:text-left">
+            <h1 class="text-5xl font-bold">Login now!</h1>
+            <p class="py-6">
+              Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
+              quasi. In deleniti eaque aut repudiandae et a id nisi.
+            </p>
+          </div>
+          <div class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
+            <div class="card-body">
+              <form action="{{ route('login.submit') }}" method="post">
+                @csrf
+                <fieldset class="fieldset">
+                    <label class="label">Email</label>
+                    <input type="email" name="email" class="input" placeholder="Email" />
+                    <label class="label">Password</label>
+                    <input type="password" name="password" class="input" placeholder="Password" />
+                    <div><a class="link link-hover">Forgot password?</a></div>
+                    <button type="submit" class="btn btn-neutral mt-4">Login</button>
+                  </fieldset>
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+</html>
+
+
+
+
+
+
+5. Create Route:
+----------------
+Route>web.php:
+Route::post('/login', [CustomUserController::class, 'loginSubmit'])->name('login.submit');
+Route::get('/dashboard', [CustomUserController::class, 'dashboard'])->middleware('custom.auth')->name('custom_auth.dashboard');
+
+
+
+
+
+
+
+
+
+
+
+
+
