@@ -1,0 +1,201 @@
+Laravel Sanctum:
+================
+
+
+1. Create a New Laravel Project:
+--------------------------------
+Command: laravel new my-sanctum
+Then, Answer Some Question and finish
+
+
+
+
+2. What is Laravel Sanctum?
+---------------------------
+=> Laravel Sanctum হলো Laravel-এর একটি API authentication system, যেটা খুব সহজভাবে token ভিত্তিক লগইন এবং SPA / Mobile App / API authentication করতে দেয়।
+
+সহজ বাংলায় বললে—
+
+✅ Laravel Sanctum কী? (সহজ ভাষায়)
+
+Sanctum হলো Laravel-এর একটি সিকিউরিটি টুল, যেটা দিয়ে তুমি—
+
+✔️ A. API এর জন্য Token তৈরি করতে পারো
+
+যেমন Mobile App / React / Vue / Flutter অ্যাপের জন্য।
+
+✔️ B. SPA (Single Page Application)-এর জন্য নিরাপদ কুকি ভিত্তিক লগইন করতে পারো
+
+যেমন Vue/React frontend + Laravel backend।
+
+✔️ C. প্রতিটি ব্যবহারকারীর জন্য অনেকগুলো personal access token তৈরি করতে পারো
+
+যেমন Admin, User, Manager—সবাই আলাদা আলাদা token পেতে পারে।
+
+
+
+
+3. Sanctum Installation:
+------------------------
+Command: php artisan install:api
+Then, Command: php artisan migration
+
+
+3.1) Edit User Model and Import HasApiToken:
+--------------------------------------------
+User.php:
+use Laravel\Sanctum\HasApiTokens;
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable, HasApiTokens;
+}
+
+
+
+
+4. Update Auth Configuration:
+-----------------------------
+Edit config>auth.php:
+'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+    ],
+
+
+
+5. Create A AuthController:
+---------------------------
+Command: php artisan make:controller AuthController
+
+
+
+6. Working with register + Postman Test:
+----------------------------------------
+6. A) Edit AuthController:
+app>http>controller>AuthController.php:
+// Registration
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|max:255|email|unique:users',
+            'password' => 'required|min:6|string',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User Created Successfully!'
+        ]);
+    }
+
+
+6. B) Route:
+Edit Route>api.php:
+Route::post('/register', [AuthController::class, 'register']);
+
+
+
+6. C) Postman:
+Post URL: http://127.0.0.1:8083/api/register
+Then, Body>JSON Data:
+{
+	"name": "MD ROKIBUL HASSAN",
+    "email": "hassan0cse@gmail.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+}
+
+
+
+7. Working with login + Postman Test:
+-------------------------------------
+7. A) Edit AuthController:
+app>http>controller>AuthController.php:
+// Login
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|max:255',
+            'password' => 'required|string|min:6',
+        ]);
+
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized!'
+            ], 401);
+        }
+
+        $user = User::where('email', $request->email)->firstOrFail();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'status' => true,
+            'token' => $token,
+            'message' => 'User Login Successfully!'
+        ]);
+    }
+
+
+7. B) Route:
+Edit Route>api.php:
+Route::post('/login', [AuthController::class, 'login']);
+
+
+
+7. C) Postman:
+Post URL: http://127.0.0.1:8083/api/login
+Then, Body>JSON Data:
+{
+    "email": "hassan0cse@gmail.com",
+    "password": "password123"
+}
+
+
+
+
+
+
+8. Working with logout + Postman Test:
+--------------------------------------
+8. A) Edit AuthController:
+app>http>controller>AuthController.php:
+// logout
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'User Logout Successfully!'
+        ]);
+    }
+
+
+
+8. B) Route:
+Edit Route>api.php:
+// After Login
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+
+8. C) Postman: এখানে Header এর key: Authorization, Value: Bearer token দিতে হবে। লগিনের টোকেন।
+Post URL: http://127.0.0.1:8083/api/login
+Then, Header>
+Key: Authorization, Value: Bearer 4|WKJdP1LUFBpZK0WZ0UqzXSojSlqElQThlaZhKLPe367f9973
+
+
+
+

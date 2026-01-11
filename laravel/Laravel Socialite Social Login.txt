@@ -1,0 +1,473 @@
+Laravel Socialite Social Login:
+===============================
+Resources:
+Ostad Batch 3: ৪৩ - [Reward Module]
+Guide Line Link: https://github.com/mabdusshakur/laravel-socialite-guide/blob/main/README.md
+Socialite Link: https://socialiteproviders.com/about/
+
+
+1. New Laravel Project Create:
+------------------------------
+Command: composer global require laravel/installer
+Then, Command: Laravel new my-socialite-app
+Then, Some Question and Answer to finished.
+
+
+
+1. A) Optional: Add Two Column user Database:
+Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+
+            // Provider & provider_id avatar optional
+            $table->string('provider')->nullable();
+            $table->string('provider_id')->nullable();
+            $table->string('avatar')->nullable();
+
+            $table->rememberToken();
+            $table->timestamps();
+        });
+Then, Command: php artisan migrate:fresh
+
+
+2. Laravel Socialite Install:
+Command: composer require laravel/socialite
+
+
+
+
+2.1 GitHub Access Token:
+------------------------
+Go Profile Settings>Developer Settings>OAuth Apps>new OAuth app:
+Registration korle Client Id Pabo
+
+GITHUB_CLIENT_ID:
+GITHUB_CLIENT_ID=Ov23li8ZgE7xCF7Rgscz
+
+GITHUB_CLIENT_SECRET:
+GITHUB_CLIENT_SECRET=a3bafc62497e37adf75d2305d5c2ce0ce23f4954
+
+GITHUB_REDIRECT_URI:
+GITHUB_REDIRECT_URI=http://127.0.0.1:8081/auth/github/callback
+
+
+
+3. Create Controller and Route:
+3. A) Controller:
+Command: php artisan make:controller SocialiteController
+
+Edit app>http>controller>SocialiteController.php:
+// redirect to provider page
+    public function redirect($provider)
+    {
+        return Socialite::driver($provider)->redirect();
+    }
+
+    // handle callback from provider (Google, GitHub etc)
+    public function callback($provider)
+    {
+        $socialUser = Socialite::driver($provider)->user();
+
+        $user = User::firstOrCreate([
+            'email' => $socialUser->getEmail(),
+        ], [
+            'name'        => $socialUser->getName() ?? $socialUser->getNickname() ?? 'User',
+            'password'    => Hash::make(Str::random(24)),
+            'provider'    => $provider,
+            'avatar'      => $socialUser->getAvatar(),
+            'provider_id' => $socialUser->getId(),
+        ]);
+
+        Auth::login($user);
+
+        return redirect('/dashboard');
+    }
+
+
+
+
+3. B) Create Route>web.php:
+Edit Route>web.php:
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+Route::middleware('auth')->get('/dashboard', function () {
+    return view('dashboard');
+});
+
+Route::middleware('auth')->post('/logout', function () {
+    Auth::logout();
+    return redirect()->route('login');
+})->name('logout');
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+
+Route::get('auth/{provider}', [SocialiteController::class, 'redirect'])->name('socialite.redirect');
+Route::get('auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('socialite.callback');
+
+
+
+
+3. C) Edit User Model:
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'provider',
+        'provider_id',
+        'avatar',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    public function getAvatar()
+    {
+        return $this->avatar;
+    }
+}
+
+
+
+
+3. D) Create 3 Blade:
+---------------------
+3. D. i) welcome.blade.php:
+---------------------------
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ config('app.name', 'Laravel') }}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+
+    <!-- Styles / Scripts -->
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+
+    @endif
+</head>
+
+<body
+    class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
+    <div>
+        <h1 class="text-gray text-7xl">Hello</h1>
+    </div>
+</body>
+
+</html>
+
+
+
+3. D. ii) login.blade.php:
+-------------------------
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social App</title>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="w-full bg-white/80 backdrop-blur-md shadow-sm py-4 px-8 flex items-center justify-between">
+        <div class="text-2xl font-bold">
+            <span class="text-pink-500">💬 Social</span><span class="text-blue-500"> App</span>
+        </div>
+
+        <div class="flex items-center gap-4">
+            @auth
+                <form action="{{ route('logout') }}" method="post">
+                    @csrf
+                    <button class="class="px-4 py-2 border border-red-500 text-red-500 rounded-full hover:bg-red-500
+                        hover:text-white transition""> <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}"
+                    class="px-4 py-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition">
+                    <i class="fa-solid fa-right-to-bracket mr-1"></i> Login
+                </a>
+            @endauth
+
+            <img src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full border" alt="">
+        </div>
+    </nav>
+
+    <!-- Center Section -->
+    <div class="flex items-center justify-center mt-20">
+        <div
+            class="bg-white shadow-xl rounded-2xl p-10 w-80 text-center transform transition hover:scale-105 duration-200">
+
+            <h2 class="text-3xl font-semibold mb-6">
+                <span class="text-pink-500">Social</span> <span class="text-blue-500">App</span>
+            </h2>
+
+            <!-- Google Button -->
+            <a href="{{ route('socialite.redirect', 'google') }}"
+                class="w-full flex items-center justify-center gap-3 bg-red-500 text-white py-3 rounded-lg shadow-md mb-4 hover:bg-red-600 transition">
+                <i class="fa-brands fa-google text-xl"></i> Login with Google
+            </a>
+
+            <!-- Github Button -->
+            <a href="{{ route('socialite.redirect', 'github') }}"
+                class="w-full flex items-center justify-center gap-3 bg-black text-white py-3 rounded-lg shadow-md hover:bg-gray-900 transition">
+                <i class="fa-brands fa-github text-xl"></i> Login with Github
+            </a>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+
+3. D. iii) dashboard.blade.php:
+-------------------------------
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- MAIN WRAPPER -->
+    <div class="flex min-h-screen">
+
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-white shadow-md p-6 hidden md:block">
+            <h2 class="text-2xl font-bold mb-8">
+                <span class="text-blue-600">Dashboard</span>
+            </h2>
+
+            <nav class="space-y-4">
+                <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-blue-500">
+                    <i class="fa-solid fa-chart-line"></i> Overview
+                </a>
+
+                <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-blue-500">
+                    <i class="fa-solid fa-users"></i> Users
+                </a>
+
+                <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-blue-500">
+                    <i class="fa-solid fa-gear"></i> Settings
+                </a>
+
+                <form action="{{ route('logout') }}" method="post">
+                    @csrf
+                    <button class="class="px-4 py-2 border border-red-500 text-red-500 rounded-full hover:bg-red-500
+                        hover:text-white transition""> <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout</button>
+                </form>
+            </nav>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-1">
+
+            <!-- TOP NAVBAR -->
+            <div class="w-full bg-white shadow-md px-6 py-4 flex justify-between items-center">
+                <h1 class="text-xl font-semibold">Welcome Back, {{ Auth::user()->name }} 👋</h1>
+
+                <div class="flex items-center gap-4">
+                    <i class="fa-solid fa-bell text-gray-700 text-xl cursor-pointer"></i>
+                    <img src="{{ Auth::user()->getAvatar() }}" class="w-10 h-10 rounded-full" alt="">
+                </div>
+            </div>
+
+            <!-- DASHBOARD CONTENT -->
+            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Card 1 -->
+                <div class="bg-white p-6 rounded-xl shadow hover:scale-[1.02] transition">
+                    <h3 class="text-lg font-semibold mb-3">Users</h3>
+                    <p class="text-3xl font-bold text-blue-600">1,240</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white p-6 rounded-xl shadow hover:scale-[1.02] transition">
+                    <h3 class="text-lg font-semibold mb-3">Orders</h3>
+                    <p class="text-3xl font-bold text-green-600">530</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white p-6 rounded-xl shadow hover:scale-[1.02] transition">
+                    <h3 class="text-lg font-semibold mb-3">Revenue</h3>
+                    <p class="text-3xl font-bold text-purple-600">$12,400</p>
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>
+
+
+
+
+4. Edit Config>services.php:
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Third Party Services
+    |--------------------------------------------------------------------------
+    |
+    | This file is for storing the credentials for third party services such
+    | as Mailgun, Postmark, AWS and more. This file provides the de facto
+    | location for this type of information, allowing packages to have
+    | a conventional file to locate the various service credentials.
+    |
+    */
+
+    'postmark' => [
+        'key' => env('POSTMARK_API_KEY'),
+    ],
+
+    'resend' => [
+        'key' => env('RESEND_API_KEY'),
+    ],
+
+    'ses' => [
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    ],
+
+    'slack' => [
+        'notifications' => [
+            'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
+            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+        ],
+    ],
+
+    // config/services.php
+    'github' => [
+        'client_id' => env('GITHUB_CLIENT_ID'),
+        'client_secret' => env('GITHUB_CLIENT_SECRET'),
+        'redirect' => env('GITHUB_REDIRECT_URI'),
+    ],
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+    // 'facebook' => [
+    //     'client_id' => env('FACEBOOK_CLIENT_ID'),
+    //     'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+    //     'redirect' => env('FACEBOOK_REDIRECT_URI'),
+    // ],
+    // 'twitter' => [
+    //     'client_id' => env('TWITTER_CLIENT_ID'),
+    //     'client_secret' => env('TWITTER_CLIENT_SECRET'),
+    //     'redirect' => env('TWITTER_REDIRECT_URI'),
+    // ],
+    // 'linkedin' => [
+    //     'client_id' => env('LINKEDIN_CLIENT_ID'),
+    //     'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+    //     'redirect' => env('LINKEDIN_REDIRECT_URI'),
+    // ],
+    // 'bitbucket' => [
+    //     'client_id' => env('BITBUCKET_CLIENT_ID'),
+    //     'client_secret' => env('BITBUCKET_CLIENT_SECRET'),
+    //     'redirect' => env('BITBUCKET_REDIRECT_URI'),
+    // ],
+    // 'gitlab' => [
+    //     'client_id' => env('GITLAB_CLIENT_ID'),
+    //     'client_secret' => env('GITLAB_CLIENT_SECRET'),
+    //     'redirect' => env('GITLAB_REDIRECT_URI'),
+    // ],
+
+];
+
+
+
+
+
+
+
+
+5. Edit .env:
+
+GITHUB_CLIENT_ID=Ov23li8ZgE7xCF7Rgscz
+GITHUB_CLIENT_SECRET=a3bafc62497e37adf75d2305d5c2ce0ce23f4954
+GITHUB_REDIRECT_URI=http://127.0.0.1:8081/auth/github/callback
+
+# GOOGLE_CLIENT_ID=your-google-client-id
+# GOOGLE_CLIENT_SECRET=your-google-client-secret
+# GOOGLE_REDIRECT_URI=https://your-app.com/auth/google/callback
+
+# FACEBOOK_CLIENT_ID=your-facebook-client-id
+# FACEBOOK_CLIENT_SECRET=your-facebook-client-secret
+# FACEBOOK_REDIRECT_URI=https://your-app.com/auth/facebook/callback
+
+# TWITTER_CLIENT_ID=your-twitter-client-id
+# TWITTER_CLIENT_SECRET=your-twitter-client-secret
+# TWITTER_REDIRECT_URI=https://your-app.com/auth/twitter/callback
+
+# LINKEDIN_CLIENT_ID=your-linkedin-client-id
+# LINKEDIN_CLIENT_SECRET=your-linkedin-client-secret
+# LINKEDIN_REDIRECT_URI=https://your-app.com/auth/linkedin/callback
+
+# BITBUCKET_CLIENT_ID=your-bitbucket-client-id
+# BITBUCKET_CLIENT_SECRET=your-bitbucket-client-secret
+# BITBUCKET_REDIRECT_URI=https://your-app.com/auth/bitbucket/callback
+
+# GITLAB_CLIENT_ID=your-gitlab-client-id
+# GITLAB_CLIENT_SECRET=your-gitlab-client-secret
+# GITLAB_REDIRECT_URI=https://your-app.com/auth/gitlab/callback

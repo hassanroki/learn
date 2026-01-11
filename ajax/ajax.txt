@@ -1,0 +1,187 @@
+AJAX:
+=====
+
+
+1. What is AJAX?
+=> AJAX means Asynchronous JavaScript and XML.
+AJAX হলো এমন একটি টেকনিক যেটা ওয়েবপেজ রিলোড না করেই সার্ভার থেকে ডাটা পাঠানো/নেওয়া যায়।
+
+
+Example: ৩টা ফাইল খুলি script.js, index.html, data.txt
+ডাটা ফোল্ডারে রাখি data.txt
+
+index.html:
+-----------
+<div id="demo">
+        <h2>Learn AJAX</h2>
+        <button onclick="loadData()">Change Content</button>
+    </div>
+   
+    <script src="script.js"></script>
+
+
+script.js:
+----------
+function loadData() {
+  // Create new request
+  const xhr = new XMLHttpRequest();
+
+  // what to do when response arrives
+  xhr.onload = function () {
+    const content = document.getElementById("demo");
+    content.innerHTML = xhr.responseText;
+  };
+
+  // prepared request - method: GET, POST, PATCH, DELETE, OPTIONS
+  xhr.open("GET", "./data/data.txt");
+
+  // sent request
+  xhr.send();
+}
+
+
+data.txt:
+--------
+<h1>New Content</h1>
+<p> Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum repellendus, dolores culpa quae nihil pariatur amet, sequi odit, cum alias recusandae ratione perferendis laudantium corporis quidem provident commodi a reprehenderit.</p>
+
+
+
+
+
+2. Multi Callback Function:
+Example: ৩টা ফাইল খুলি script.js, index.html, data.txt
+ডাটা ফোল্ডারে রাখি data.txt
+
+index.html:
+----------
+ <div id="demo">
+        <h2>Learn AJAX</h2>
+        <button onclick="loadData(myCallback1)">Change Content</button>
+        <button onclick="loadData(myCallback2)">Change Content Bellow Show</button>
+    </div>
+
+    <div id="demo2"></div>
+   
+    <script src="script.js"></script>
+
+
+
+script.js:
+---------
+function loadData(myCallbackF) {
+  // Create new request
+  const xhr = new XMLHttpRequest();
+
+  // what to do when response arrives
+  xhr.onload = function () {
+    myCallbackF(this);
+  };
+
+  // prepared request - method: GET, POST, PATCH, DELETE, OPTIONS
+  xhr.open("GET", "./data/data.txt");
+
+  // sent request
+  xhr.send();
+}
+
+function myCallback1(xhr) {
+  const content = document.getElementById("demo");
+  content.innerHTML = xhr.responseText;
+}
+
+function myCallback2(xhr) {
+  const content = document.getElementById("demo2");
+  content.innerHTML = xhr.responseText;
+}
+
+
+
+data.txt:
+---------
+<h1>New Content</h1>
+<p> Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum repellendus, dolores culpa quae nihil pariatur amet, sequi odit, cum alias recusandae ratione perferendis laudantium corporis quidem provident commodi a reprehenderit.</p>
+
+
+
+
+
+
+3. AJAX Get and Send Standard Example:
+Example: ২টা ফাইল খুলি script.js, index.html
+
+index.html:
+----------
+  <p><button id="get">Get Data</button></p>
+    <p><button id="send">Send Data</button></p>
+
+    <script src="script.js"></script>
+
+
+
+script.js:
+---------
+function sendRequest(method, url) {
+  const promise = new Promise((resolve, reject, data) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.onload = function () {
+      // Handle Application Error
+      if (this.status >= 400) {
+        reject(`There was an application error, status is ${this.status}`);
+      } else {
+        resolve(this.response);
+      }
+    };
+
+    // Parse JSON
+    xhr.responseType = "json";
+
+    // Error Handle
+    xhr.onerror = function () {
+      reject("There was an error!");
+    };
+
+    xhr.open(method, url);
+
+    xhr.send(data);
+  });
+
+  return promise;
+}
+
+function getData() {
+  sendRequest("GET", "https://jsonplaceholder.typicode.com/posts/100")
+    .then((responseData) => {
+      console.log(responseData);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+function sendData() {
+  sendRequest(
+    "POST",
+    "https://jsonplaceholder.typicode.com/posts",
+    JSON.stringify({
+      title: "foo",
+      body: "bar",
+      userId: 1,
+    })
+  ).then((responseData) => {
+    console.log(responseData);
+  });
+}
+
+let getButton = document.getElementById("get");
+let sendButton = document.getElementById("send");
+
+getButton.addEventListener("click", getData);
+sendButton.addEventListener("click", sendData);
+
+
+
+
+
+
