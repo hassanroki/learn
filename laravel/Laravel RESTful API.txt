@@ -1,7 +1,207 @@
-Laravel RESTful API:
-====================
+Laravel RESTful API: Batch -09 => Module-22: Introduction to Postman, RESTful API Fundamentals, Routing, CRUD Operations, JSON Responses, Validation, and API Testing with Postman
+===================================================================================================================================================================================
 
 1. What is API?
+---------------
 = Application Programming Interface.
 
-2. 
+2. API Install: Rest API নিয়ে কাজ করতে চাইলে API Install করতে হবে।
+Command: php artisan install:api
+Url: http://127.0.0.1:8081/api
+
+
+3. How to work API Example:
+---------------------------
+I) Command: php artisan install:api
+
+ii) Create Route>api.php:
+Route::post('/test', action: [TaskController::class, 'test']);
+
+
+iii) TaskController.php:
+  public function test(Request $request){
+        $name = $request->name;
+        return response()->json([
+            "name" => $name,
+            "Test endpoint is working"
+        ]);
+    }
+
+
+iv) Postman:
+------------
+URL POST: http://127.0.0.1:8081/api/test
+Then, body>raw>json:
+{
+    "name": "Sobuj"
+}
+
+
+
+4. Try-catch Used:
+------------------
+public function store(Request $request)
+    {
+        try {
+            $title = $request->title;
+            $description = $request->description;
+
+            $task = new Task();
+            $task->title = $title;
+            $task->description = $description;
+            $task->save();
+
+            return response()->json([
+                'message' => "Task Created Successfull!",
+            ], 201);
+        } catch (Exception $th) {
+            return response()->json([
+                'message' => "Task Created Failed!",
+            ], 404);
+        }
+    }
+
+
+
+
+5. API CRUD Example:
+--------------------
+5. I) Route>api.php:
+Route::get('/list', action: [TaskController::class, 'list']);
+Route::get('/list/{id}/single', action: [TaskController::class, 'single']);
+Route::post('/test', action: [TaskController::class, 'test']);
+Route::post('/store', action: [TaskController::class, 'store']);
+Route::post('/task/{id}', action: [TaskController::class, 'update']);
+Route::delete('/delete/{id}', action: [TaskController::class, 'destory']);
+
+
+
+5. ii) Controller:
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Task;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class TaskController extends Controller
+{
+    //
+    public function list(Request $request)
+    {
+        $tasks = Task::all();
+        return response()->json([
+            "message" => "Task retrived successfully!",
+            "data" => $tasks
+        ]);
+    }
+
+    // Test
+    public function test(Request $request)
+    {
+        $name = $request->name;
+        return response()->json([
+            "name" => $name,
+            "Test endpoint is working"
+        ]);
+    }
+
+    // store
+    public function store(Request $request)
+    {
+        // Image Postman theke form data theke data sent korte hobe
+        try {
+            $title = $request->title;
+            $description = $request->description;
+
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('tasks/test', 'public');
+            }
+
+            $task = new Task();
+            $task->title = $title;
+            $task->description = $description;
+            $task->image = $imagePath;
+            $task->save();
+
+            return response()->json([
+                'message' => "Task Created Successfull!",
+                'data' => $task,
+            ], 201);
+        } catch (Exception $th) {
+            return response()->json([
+                'message' => "Task Created Failed!",
+                'error' => $th->getMessage(),
+            ], 404);
+        }
+    }
+
+    // Single Task
+    public function single($id)
+    {
+        try {
+            $task = Task::findOrFail($id);
+
+            return response()->json([
+                'message' => "Task retrived successfully!",
+                'data' => $task
+            ], 201);
+        } catch (Exception $th) {
+            return response()->json([
+                'message' => "Task retrived Failed!",
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    // Update / Edit Task
+    public function update(Request $request, $id)
+    {
+        try {
+            $task = Task::findOrFail($id);
+
+
+            $task->title = $request->title ?? $task->title;
+            $task->description = $request->description ?? $task->description;
+
+            if ($request->hasFile('image')) {
+
+                if ($task->image && Storage::disk('public')->exists($task->image)) {
+                    Storage::disk('public')->delete($task->image);
+                }
+
+                $imagePath = $request->file('image')->store('tasks/test', 'public');
+                $task->image = $imagePath;
+            }
+
+            $task->save();
+            return response()->json([
+                'message' => 'Task Updated Successfully!',
+                'data' => $task
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Task Update Failed!',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    // Delete
+    public function destory($id)
+    {
+        $task = Task::findOrFail($id);
+        $task->delete();
+
+        return response()->json([
+            'message' => "Task Delete Success!",
+        ]);
+    }
+}
+
+

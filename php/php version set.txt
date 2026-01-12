@@ -1,0 +1,74 @@
+Laragon PHP Multi Version Used:
+===============================
+
+#1. => Version Download $ Exact:
+--------------------------------
+C:\laragon\bin\php\php-7.4.33-Win32-vc15-x64
+C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64   ← already installed
+
+
+
+
+#2 -> PHP Version Set PC PowerShell and CMD:
+--------------------------------------------
+✅ PowerShell + CMD উভয় জায়গায় ৭.৪ এবং ৮.৩ চালাতে পারবে
+⭐ Step–1: PowerShell এ alias সেট করো
+
+PowerShell খুলে লেখো:
+
+notepad $PROFILE
+
+
+ফাইলে নিচের ৩ লাইন paste করো:
+
+Set-Alias php74 "C:\laragon\bin\php\php-7.4.33-Win32-vc15-x64\php.exe"
+Set-Alias php83 "C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64\php.exe"
+Set-Alias php "C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64\php.exe"   # Default PHP = 8.3
+
+
+Save → PowerShell restart।
+
+এখন test:
+
+php74 -v
+php83 -v
+php -v
+
+⭐ Step–2: CMD এ ব্যবহার করতে চাইলে (Batch shortcut)
+
+C:\ drive এ ৩টা ফাইল বানাও:
+
+🔹 1) php74.cmd
+@echo off
+"C:\laragon\bin\php\php-7.4.33-Win32-vc15-x64\php.exe" %*
+
+🔹 2) php83.cmd
+@echo off
+"C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64\php.exe" %*
+
+🔹 3) php.cmd (default php = 8.3)
+@echo off
+"C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64\php.exe" %*
+
+
+তারপর PATH এ শুধু এইটি add করবে:
+
+C:\
+
+
+এখন CMD তে:
+
+php74 -v
+php83 -v
+php -v
+
+
+সব কাজ করবে।
+
+
+
+
+
+#3. => Laravel PHP Version Run:
+-------------------------------
+Laragon → Menu → PHP → Version

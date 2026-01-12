@@ -1,0 +1,57 @@
+1. Variable:
+------------
+1. A) typeOf: variable এর টাইপ চেক করে।
+Example:
+let num = 10;
+console.log(typeof(num));
+
+Output: number
+
+
+
+1. B) ParseInt: Integer Number e convert kore
+Example:
+let num1 = "10.10 tk";
+
+console.log(parseInt(num1));
+
+Output: 10
+
+
+1. C) ParseFoat: Float Number e Convert kore.
+Example:
+let num1 = "10.10 tk";
+
+console.log(parseFloat(num1));
+
+Output: 10.1
+
+Another: // Example 2: Invalid number
+let invalid = "abc123";
+let result = parseFloat(invalid);
+
+console.log(result);     // NaN
+
+
+
+1. D) Math.round() সবসময় .5 এবং তার উপরে number উপরের দিকে round করে।
+Example:
+let num1 = 10.5;
+
+console.log(Math.round(num1));
+
+Output: 11
+
+
+
+
+2. Array:
+---------
+2. A) Length: Array Length Find: Length ber korte used k
+Example:
+let studentMarks = [10, 30, 40, 56, 66];
+console.log(studentMarks.length);
+
+Output: 5
+
+
