@@ -496,6 +496,324 @@ Route::prefix('/v1')->group(function () {
 
 
 
+#04 => Sanctum: API Authentication:
+====================================
+লারাভেল ডিফল্ট sanctum setup করা থাকে। তবু setup করতে চাইলে 
+Command: composer require Laravel/sanctum
+
+#4.1 Registration:
+4.1. A) Laravel Sanctum নিয়ে কাজ করতে চাইলে প্রথমে HasApiTokens used করতে হবে।
+Edit app>http>Model>User.php:
+-----------------------------
+use Laravel\Sanctum\HasApiTokens;
+use HasApiTokens, HasFactory, Notifiable;
+
+
+4.1. B) AuthController Create করি।
+Command: php artisan make:controller Auth/AuthController.php
+Edit app>http>controller>Auth>AuthController.php:
+-------------------------------------------------
+// Registration
+    public function register(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:6',
+            ]);
+
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+            ]);
+
+            // Registration after direct login, so create token
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Registration successfully!',
+                'token_type' => 'Bearer',
+                'access_token' => $token,
+                'data' => $user,
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Registration Failed!',
+                'errors' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+
+
+4.1. C) Create API Route:
+----------------------
+ Route::post('/register', [AuthController::class, 'register']);
+
+Then, PostMant JSON Registration:
+{
+    "name": "ROKIBUL",
+    "email": "rokibul@gmail.com",
+    "password": "123456"
+}
+
+
+
+4.2) Login
+----------
+
+4.2. A) Login Create Method:
+Edit app>http>controller>Auth>AuthController.php:
+-------------------------------------------------
+// login
+    public function login(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required', 'string'],
+            ]);
+
+            $user = User::where('email', $data['email'])->first();
+            if (!$user || !Hash::check($data['password'], $user->password)) {
+                throw ValidationException::withMessages([
+                    'email' => ['The provided credentials are incorrect.'],
+                ]);
+            }
+
+            $user->tokens()->delete();
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'User login successfully',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], status: 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Server error',
+            ], 500);
+        }
+    }
+
+
+
+4.2. A) API Route
+Edit Route>api.php:
+Route::post('/login', [AuthController::class, 'login']);
+
+4.2. C) Postman
+{
+    "email": "rokibul@gmail.com",
+    "password": "123456"
+}
+
+
+
+4.3 Logout:
+-----------
+
+4.3 A) Create Method:
+Edit app>http>controller>Auth>AuthController.php:
+-------------------------------------------------
+// Logout
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'User logout successfully!',
+        ]);
+    }
+
+4.3 B) Middleware দিয়ে auth করতে হবে।
+Create Route>api.php:
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+
+4.3 C) প্রথমে Postman এর header এ key: Accept and Value: application/json দিতে হবে।
+2nd Postman এর Authorization এ Bearer Token Select করে Token Pass (such as token: 3|cbXV9Vtf71G0LSfTJHKj45HhkAyiopRtygCN3ct7a587d751) করতে হবে, মানে লগিন এর সময় যে টোকেন তৈরি হয় সেটা।
+
+
+
+
+4.4 Authorization:
+Just Used Middleware
+Route::get('/list', action: [TaskController::class, 'list'])->middleware('auth.sanctum');
+
+Then, Postman 
+প্রথমে Postman এর header এ key: Accept and Value: application/json দিতে হবে।
+2nd Postman এর Authorization এ Bearer Token Select করে Token Pass (such as token: 3|cbXV9Vtf71G0LSfTJHKj45HhkAyiopRtygCN3ct7a587d751) করতে হবে, মানে লগিন এর সময় যে টোকেন তৈরি হয় সেটা।
+
+
+
+4.5 Route Group:
+// Version Control Or Multi url
+Route::prefix('/v1')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+
+    // Group
+    Route::middleware('auth:sanctum')->group(function(){
+        Route::post('/logout', [AuthController::class, 'logout']);
+        // All Task
+        Route::get('/list', action: [TaskController::class, 'list']);
+        // Categories
+        Route::get('/categories', [CategoryController::class, 'index']);
+        Route::get('/categories-products', [CategoryController::class, 'categoryWithProduct']);
+    });
+
+});
+
+
+
+
+4.6 => Login Max Device 3:
+----------------------------
+Edit app>http>controller>Auth>AuthController.php:
+-------------------------------------------------
+ // login
+    public function login(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required', 'string'],
+            ]);
+
+            $user = User::where('email', $data['email'])->first();
+            if (!$user || !Hash::check($data['password'], $user->password)) {
+                throw ValidationException::withMessages([
+                    'email' => ['The provided credentials are incorrect.'],
+                ]);
+            }
+
+            // $user->tokens()->delete();
+            $maxDevice = 3;
+            $activeTokenCount = $user->tokens()->count();
+
+            if ($activeTokenCount > $maxDevice) {
+                return response()->json([
+                    'message' => 'Maximum device limit reached. Please logout from another device to login.',
+                ], 403);
+            }
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'User login successfully',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], status: 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Server error',
+            ], 500);
+        }
+    }
+
+
+
+
+
+4.7 => Max Device Login, Such as Netflix
+-----------------------------------------
+Edit app>http>controller>Auth>AuthController.php:
+-------------------------------------------------
+  // login
+    public function login(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required', 'string'],
+            ]);
+
+            $user = User::where('email', $data['email'])->first();
+            if (!$user || !Hash::check($data['password'], $user->password)) {
+                throw ValidationException::withMessages([
+                    'email' => ['The provided credentials are incorrect.'],
+                ]);
+            }
+
+            // On Device
+            // $user->tokens()->delete();
+            $maxDevice = 3;
+            $activeTokenCount = $user->tokens()->count();
+
+            // Max 3 Device
+            // if ($activeTokenCount > $maxDevice) {
+            //     return response()->json([
+            //         'message' => 'Maximum device limit reached. Please logout from another device to login.',
+            //     ], 403);
+            // }
+
+            // Oldest Token Delete
+            if ($activeTokenCount >= $maxDevice) {
+                $user->tokens()
+                    ->orderBy('created_at')
+                    ->limit(1)
+                    ->delete();
+            }
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'User login successfully',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], status: 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Server error',
+            ], 500);
+        }
+    }
+
+
+
+
+
+
+
+
+
+5 => API Documentation: Very Important Topics
+==============================================
+Environment Setup করে Postman Dynamic করতে পারি।
+Environment Name দিবো। দিলাম name API
+Then, Variable এর নাম baseurl, value দিবো http://127.0.0.1:8081/api/
+আবার, Variable এর নাম access_token, value দিবো 21|5tjFL34bTvYZZTv6kLW0fbcxFCL2cJYLec5ogIZ76ba2b549
+
+এখন collection এ select API
+Description দিবো।
+Route Set: {{baseurl}}v1/list
+Header: Key->Accept Value->application/json
+Authorization: Auth Type: Bearer Token, Token: {{access_token}}
+
+Collection Export করতে পারি। 
+Then, Chatgpt টিকে দিয়ে documentation করে readme file এ দিবো।
+
+
+
+
 
 
 
