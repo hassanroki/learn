@@ -1,11 +1,16 @@
 Laravel RESTful API: Batch -09 => Module-22: Introduction to Postman, RESTful API Fundamentals, Routing, CRUD Operations, JSON Responses, Validation, and API Testing with Postman
 ===================================================================================================================================================================================
 
-1. What is API?
----------------
+1. What is an API?
+------------------
 = Application Programming Interface.
 
-2. API Install: Rest API নিয়ে কাজ করতে চাইলে API Install করতে হবে।
+2.1 Laravel Install:
+Command: Laravel new api-co1 
+Then, Some Question answer and finish
+
+
+2.2 API Install: Rest API নিয়ে কাজ করতে চাইলে API Install করতে হবে।
 Command: php artisan install:api
 Url: http://127.0.0.1:8081/api
 

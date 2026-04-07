@@ -1,0 +1,273 @@
+Ostad Batch 09: Module 23 => খুবই important ১টা topics
+JavaScript AJAX Mastery with Fetch API & Axios
+===============================================
+
+Class 01: Understanding AJAX Fundamentals:
+------------------------------------------
+1. What is ajax?
+= AJAX (Asynchronous JavaScript and XML) is a set of web development techniques
+that allows web pages to update content dynamically without requiring a full page reload.
+
+2. What is Axios?
+= Axios is a popular, promise-based HTTP client library for JavaScript, used to make asynchronous network requests from browsers
+
+3. Asynchronous?
+= একটা কাজ করছি, এটা শেষ না করে অন্যটা শুরু করলাম, সব গুলা প্যারালালে চলবে।
+আর Synchronous হলো একটা শেষ না হলে অন্য টা চলবে না। 
+
+4. Crud Ajax & Axios Example:
+4.1 index.html:
+---------------
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX - C01</title>
+    </span>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"><span
+        class="pln">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Product Data</h1>
+        <a href="create.html" class="button">Add New</a>
+        <div class="row">
+            <div class="column">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Product Code</th>
+                            <th>Unit Price</th>
+                            <th>Qty</th>
+                            <th>Total Price</th>
+                            <th>Delete</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="productData">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+        // Get Products
+        async function getProducts() {
+            let url = 'https://crud.teamrabbil.com/api/v1/ReadProduct';
+            let response = await axios.get(url);
+            // console.log(response);
+            let products = response.data['data'];
+            // console.log(products);
+            products.forEach((item) => {
+                document.getElementById('productData').innerHTML += (`<tr>
+                            <td>${item['ProductName']}</td>
+                            <td>${item['ProductCode']}</td>
+                            <td>${item['UnitPrice']}</td>
+                            <td>${item['Qty']}</td>
+                            <td>${item['TotalPrice']}</td>
+                            <td><button onclick="return confirm('Are you sure to Delete?') && deleteProduct('${item['_id']}')">Delete</button></td>
+                            <td><button onclick="editProduct('${item['_id']}')">Edit</button></td>
+                        </tr>`);
+            });
+
+        }
+        getProducts();
+
+
+        // Edit Product
+        function editProduct(id) {
+            window.location = `update.html?id=${id}`;
+        }
+
+
+        // Delete Product
+        async function deleteProduct(id) {
+            let url = `https://crud.teamrabbil.com/api/v1/DeleteProduct/${id}`;
+            let response = await axios.get(url);
+            document.getElementById('productData').innerHTML = '';
+            getProducts();
+        }
+    </script>
+</body>
+
+</html>
+
+
+
+
+4.2 create.html:
+----------------
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ajax</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"><span
+        class="pln">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <h1 class="column"><a href="index.html">Back</a></h1>
+            <h1 class="column">Add Product</h1>
+        </div>
+        <div class="row">
+            <div class="column">
+                <label for="ProductName">Product Name</label>
+                <input type="text" id="ProductName">
+
+                <label for="ProductCode">Product Code</label>
+                <input type="text" id="ProductCode">
+
+                <label for="UnitPrice">Unit Price</label>
+                <input type="text" id="UnitPrice">
+
+                <label for="Qty">Qty</label>
+                <input type="text" id="Qty">
+
+                <label for="TotalPrice">Total Price</label>
+                <input type="text" id="TotalPrice">
+
+                <button onclick="addNewProduct()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        async function addNewProduct() {
+            let productName = document.getElementById('ProductName').value;
+            let productCode = document.getElementById('ProductCode').value;
+            let unitPrice = document.getElementById('UnitPrice').value;
+            let qty = document.getElementById('Qty').value;
+            let totalPrice = document.getElementById('TotalPrice').value;
+            let obj = {
+                "ProductName": productName,
+                "ProductCode": productCode,
+                "UnitPrice": unitPrice,
+                "Qty": qty,
+                "TotalPrice": totalPrice,
+            }
+
+            let url = "https://crud.teamrabbil.com/api/v1/CreateProduct";
+            let response = await axios.post(url, obj)
+            window.location = 'index.html'
+        }
+    </script>
+</body>
+
+</html>
+
+
+4.3 update.html:
+----------------
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Ajax</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"><span
+        class="pln">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <h1 class="column"><a href="index.html">Back</a></h1>
+            <h1 class="column">Update Product</h1>
+        </div>
+        <div class="row">
+            <div class="column">
+                <label for="productName">Product Name</label>
+                <input type="text" id="productName">
+
+                <label for="productCode">Product Code</label>
+                <input type="text" id="productCode">
+
+                <label for="unitPrice">Unit Price</label>
+                <input type="text" id="unitPrice">
+
+                <label for="qty">Qty</label>
+                <input type="text" id="qty">
+
+                <label for="totalPrice">Total Price</label>
+                <input type="text" id="totalPrice">
+
+                <button onclick="updateProduct()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Get Product Information
+        async function getProductInfo() {
+            let urlParams = new URLSearchParams(window.location.search);
+            let id = urlParams.get('id')
+            // console.log(id);
+            let URL = `https://crud.teamrabbil.com/api/v1/ReadProductByID/${id}`
+            let response = await axios.get(URL);
+            // console.log(response);
+            let data = response.data['data'][0]
+            // console.log(data);
+            document.getElementById('productName').value = data['ProductName'];
+            document.getElementById('productCode').value = data['ProductCode'];
+            document.getElementById('unitPrice').value = data['UnitPrice'];
+            document.getElementById('qty').value = data['Qty'];
+            document.getElementById('totalPrice').value = data['TotalPrice'];
+        }
+        getProductInfo();
+
+
+        // Update Product
+        async function updateProduct() {
+            let urlParams = new URLSearchParams(window.location.search);
+            let id = urlParams.get('id');
+            // console.log(id);
+
+            let productNameValue = document.getElementById('productName').value;
+            let productCodeValue = document.getElementById('productCode').value;
+            let unitPriceValue = document.getElementById('unitPrice').value;
+            let qtyValue = document.getElementById('qty').value;
+            let totalPriceValue = document.getElementById('totalPrice').value;
+
+            let obj = {
+                "ProductName": productNameValue,
+                "ProductCode": productCodeValue,
+                "UnitPrice": unitPriceValue,
+                "Qty": qtyValue,
+                "TotalPrice": totalPriceValue,
+            }
+
+            let URL = `https://crud.teamrabbil.com/api/v1/UpdateProduct/${id}`;
+            let response = await axios.post(URL, obj);
+            window.location = "index.html";
+
+        }
+    </script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
