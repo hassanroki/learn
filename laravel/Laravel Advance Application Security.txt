@@ -1,0 +1,7 @@
+Laravel Advanced Application Security: Batch-03, Module-51:
+===========================================================
+
+1. .env এই রকম রাখবো।
+----------------------
+APP_ENV=production
+APP_DEBUG=false
