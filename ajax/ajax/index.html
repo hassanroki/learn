@@ -13,7 +13,7 @@
 <body>
     <div class="container">
         <h1>Product Data</h1>
-        <a href="" class="button">Add New</a>
+        <a href="create.html" class="button">Add New</a>
         <div class="row">
             <div class="column">
                 <table class="data-table">
@@ -39,6 +39,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+
+        // Get Products
         async function getProducts() {
             let url = 'https://crud.teamrabbil.com/api/v1/ReadProduct';
             let response = await axios.get(url);
@@ -48,17 +50,32 @@
             products.forEach((item) => {
                 document.getElementById('productData').innerHTML += (`<tr>
                             <td>${item['ProductName']}</td>
-                            <td>0001</td>
-                            <td>100</td>
-                            <td>3</td>
-                            <td>1000</td>
-                            <td>Delete</td>
-                            <td>Edit</td>
+                            <td>${item['ProductCode']}</td>
+                            <td>${item['UnitPrice']}</td>
+                            <td>${item['Qty']}</td>
+                            <td>${item['TotalPrice']}</td>
+                            <td><button onclick="return confirm('Are you sure to Delete?') && deleteProduct('${item['_id']}')">Delete</button></td>
+                            <td><button onclick="editProduct('${item['_id']}')">Edit</button></td>
                         </tr>`);
             });
-            
+
         }
         getProducts();
+
+
+        // Edit Product
+        function editProduct(id) {
+            window.location = `update.html?id=${id}`;
+        }
+
+
+        // Delete Product
+        async function deleteProduct(id) {
+            let url = `https://crud.teamrabbil.com/api/v1/DeleteProduct/${id}`;
+            let response = await axios.get(url);
+            document.getElementById('productData').innerHTML = '';
+            getProducts();
+        }
     </script>
 </body>
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ajax</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"><span
+        class="pln">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <h1 class="column"><a href="index.html">Back</a></h1>
+            <h1 class="column">Add Product</h1>
+        </div>
+        <div class="row">
+            <div class="column">
+                <label for="ProductName">Product Name</label>
+                <input type="text" id="ProductName">
+
+                <label for="ProductCode">Product Code</label>
+                <input type="text" id="ProductCode">
+
+                <label for="UnitPrice">Unit Price</label>
+                <input type="text" id="UnitPrice">
+
+                <label for="Qty">Qty</label>
+                <input type="text" id="Qty">
+
+                <label for="TotalPrice">Total Price</label>
+                <input type="text" id="TotalPrice">
+
+                <button onclick="addNewProduct()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        async function addNewProduct() {
+            let productName = document.getElementById('ProductName').value;
+            let productCode = document.getElementById('ProductCode').value;
+            let unitPrice = document.getElementById('UnitPrice').value;
+            let qty = document.getElementById('Qty').value;
+            let totalPrice = document.getElementById('TotalPrice').value;
+            let obj = {
+                "ProductName": productName,
+                "ProductCode": productCode,
+                "UnitPrice": unitPrice,
+                "Qty": qty,
+                "TotalPrice": totalPrice,
+            }
+
+            let url = "https://crud.teamrabbil.com/api/v1/CreateProduct";
+            let response = await axios.post(url, obj)
+            window.location = 'index.html'
+        }
+    </script>
+</body>
+
+</html>
