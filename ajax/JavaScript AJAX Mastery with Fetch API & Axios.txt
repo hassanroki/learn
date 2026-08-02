@@ -267,6 +267,11 @@ that allows web pages to update content dynamically without requiring a full pag
 
 
 
+Understanding AJAX Fundamentals- Part-2:
+----------------------------------------
+
+
+
 
 
 
