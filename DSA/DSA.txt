@@ -1,0 +1,35 @@
+Data Structure Algorithm (DSA)
+==============================
+
+Array:
+Linked List: Singly Linked List -> Single Way, Doubly Linked List -> Two-Way, Circular Linked List -> Loop
+Stack: LIFO -> Push, POP
+Queue: FIFO -> Enqueue, Dequeue, Circular Queue, Priority Queue
+Heap: Max-Heap, Min-Heap 
+Hash Table or Hash Map or Dictionary: Hash Function
+Set: 
+Tree: Binary Tree, Binary Search Tree(BST), Balanced Tree -> AVL Tree, Red Black
+TRIE: 
+Graph: Vertex, Edge
+Undirected Graph: 
+Directed Graph: 
+Weighted Graph: 
+Unweighted Graph: 
+Algorithm: 
+Linear Search:
+Binary Search: Must be sorted
+Sorting Algorithm: Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort
+Stack Overflow:
+
+Big O:
+Time Complexity:
+Recursion: 
+Backtracking:
+DFS: Depth First Search
+BFS: Breadth First Search
+Dijkstra's Algorithm:
+Relaxation:
+Greedy Approach: 
+Divide and Conquer:
+DP: Dynamic Programming
+Memoization: 
