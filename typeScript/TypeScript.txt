@@ -1,0 +1,247 @@
+TypeScript:
+===========
+
+
+
+1. What is TypeScript?
+-----------------------
+TypeScript is JavaScript with added syntax for types.
+TypeScript = JavaScript + Types
+
+
+2. Benefits of TypeScript?
+--------------------------
+I) Catch errors during development time.
+ii) Only active during development
+
+
+Variable Example TypeScript:
+----------------------------
+let paythonCourse:number = 1000;
+let javaScriptCourse:number = 2000;
+
+let totalPirce = paythonCourse + javaScriptCourse;
+console.log(totalPirce);
+
+
+
+
+3. TypeScript Install:
+----------------------
+Requirement: Node & NPM must be installed first
+
+TypeScript Install Command: npm install -g typescript
+Version Check Command: tsc -v
+
+TypeScript Compiled JS Command: tsc filename.ts
+
+
+
+4. Type Annotation?
+-------------------
+var myName:type = "Hassan";
+
+Any Type:
+---------
+let channelName:any = "YouTube";
+channelName = 10;
+console.log(channelName);
+
+Boolean Type:
+-------------
+let isPassed:boolean = true;
+
+
+String or Number Type:
+----------------------
+let numOfPlayList:number | string = 10;
+numOfPlayList = "elevent";
+
+
+
+5. Function TypeScript:
+-----------------------
+String and Number Example:
+--------------------------
+function sayHi(personName:string, age:number){
+    console.log("Hi", personName, "Your Age:", age);
+}
+
+sayHi("Hassan", 27);
+
+
+
+Function Type Return Number:
+-----------------------------
+function addition(num1:number, num2:number):number{
+    return num1 + num2;
+}
+
+let result = addition(12, 27);
+console.log(result);
+
+
+Function Type Return String:
+-----------------------------
+function addition(num1:number, num2:number):string{
+    return `your total number: ${num1 + num2}`;
+}
+
+let result = addition(12, 27);
+console.log(result);
+
+
+
+6. TypeScript Objects and Type Intersection:
+---------------------------------------------
+Example:
+---------
+let instructorDetails: {
+    firstName: string,
+    lastName: string,
+} = {
+    firstName: "Md",
+    lastName: "Rahim",
+}
+
+let channelDetails: {
+    channelName: string,
+    playList: number,
+    instructorDetails: {
+        firstName: string,
+        lastName: string,
+    }
+} = {
+    channelName: "Hassan",
+    playList: 10,
+    instructorDetails: {
+        firstName: "Md",
+        lastName: "Rokibul",
+    }
+}
+
+
+Essay to use TypeScript:
+-------------------------
+type NameType = {
+    firstName: string,
+    lastName: string,
+}
+
+type ChannelType = {
+    channelName: string,
+    playList: number,
+    instructorDetails: {
+        firstName: string,
+        lastName: string,
+    }
+}
+
+let instructorDetails:NameType = {
+    firstName: "Md",
+    lastName: "Rahim",
+}
+
+let instructorDetails2:NameType = {
+    firstName: "Shakib",
+    lastName: "Khan",
+}
+
+let channelDetails:ChannelType  = {
+    channelName: "Hassan",
+    playList: 10,
+    instructorDetails: {
+        firstName: "Md",
+        lastName: "Rokibul",
+    }
+}
+
+let channelDetails2:ChannelType  = {
+    channelName: "PHP Learner",
+    playList: 10,
+    instructorDetails: {
+        firstName: "Hasin",
+        lastName: "Hyder",
+    }
+}
+
+
+
+More Essays to use TypeScript:
+-------------------------------
+type NameType = {
+    firstName: string,
+    lastName: string,
+}
+
+type ChannelType = {
+    channelName: string,
+    playList: number,
+    instructorDetails: NameType
+}
+
+let instructorDetails:NameType = {
+    firstName: "Md",
+    lastName: "Rahim",
+}
+
+let instructorDetails2:NameType = {
+    firstName: "Shakib",
+    lastName: "Khan",
+}
+
+let channelDetails:ChannelType  = {
+    channelName: "Hassan",
+    playList: 10,
+    instructorDetails: {
+        firstName: "Md",
+        lastName: "Rokibul",
+    }
+}
+
+let channelDetails2:ChannelType  = {
+    channelName: "PHP Learner",
+    playList: 10,
+    instructorDetails: {
+        firstName: "Hasin",
+        lastName: "Hyder",
+    }
+}
+
+
+
+Intersection TypeScript:
+-----------------------
+type NameType = {
+    firstName: string,
+    lastName: string,
+}
+
+type ageType = {
+    age: number
+}
+
+type DetailsType = NameType & ageType
+
+function sayDetails(obj:DetailsType):string{
+    let {firstName, lastName, age} = obj
+    return `Full Name: ${firstName} ${lastName}, age: ${age}`;
+}
+
+
+let instructorDetails:DetailsType = {
+    firstName: "Hasin",
+    lastName: "Hyder",
+    age: 10
+}
+
+console.log(sayDetails(instructorDetails))
+
+
+
+
+
+
+
+
+
