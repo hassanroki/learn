@@ -1,0 +1,233 @@
+Complete Tailwind CSS Crash Course in Bangla: https://www.youtube.com/watch?v=x6XFmB5fjZM
+============================================
+16 Minutes
+
+01. => Using Tailwind CSS from CDN:
+------------------------------------
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+
+
+
+
+
+
+
+02. => Tailwind CSS with NPM:
+------------------------------
+2.1 Create package.json file:
+-----------------------------
+Command: npm init -y
+
+
+2.2 Install Tailwind CSS:
+-------------------------
+Command: npm install tailwindcss @tailwindcss/cli
+
+
+Now, create a folder named src, then create an input.css file.
+
+Edit src/input.css:
+-------------------
+@import "tailwindcss";
+
+
+Now, create a folder named dist, then create an output.css file.
+
+Edit dist/output.css:
+---------------------
+
+Now, edit package.json:
+-----------------------
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css",
+  },
+
+Then, Command: npm run build
+
+
+2.3 Load Tailwind CSS:
+----------------------
+<link rel="stylesheet" href="dist/output.css" />
+
+
+বার বার CSS পরিবর্তন করে npm run build command দেওয়া ভালো নয় সে জন্য watch চালু করবো।
+edit pakage.json:
+-----------------
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css",
+    "build:watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+  },
+
+Then, run the command: npm run build:watch
+
+
+
+Tailwind CSS Minify:
+-------------------
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css",
+    "build:watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch --minify",
+  },
+Then, run the command: npm run build:watch
+
+
+
+
+
+
+
+
+
+03. => Multiple HTML files, Tailwind CSS, and NPM:
+--------------------------------------------------
+অন্য অন্য ফাইলে <link rel="stylesheet" href="dist/output.css" /> এটা বসে দিলেই হবে।
+
+
+
+
+
+
+
+
+
+
+04. => Tailwind CSS with React.js:
+-----------------------------------
+04. i) React.js Project Creation:
+--------------------------------
+Command: npm create vite@latest react-demo
+Then, select a framework: React
+Then, select a variant: TypeScript
+Then, which linter to use? default: oxlint
+Then, install with nmp and start now?: Yes
+Then, Project directory: cd react-demo
+
+
+04. ii) Tailwind CSS and Vite Install:
+--------------------------------------
+Command: npm install tailwindcss @tailwindcss/vite
+
+Then, Import Tailwind CSS and enable it
+Edit vite.config.ts:
+---------------------
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+})
+
+
+Then Import Tailwind CSS; edit src/index.css:
+----------------------------------------------
+@import "tailwindcss";
+
+
+Now, Apply TailwindCSS:
+Edit src/app.tsx:
+-----------------
+ <h1 className="text-red-500">Get started</h1>
+
+css কাজ করবে না, কারণ App.css এ আগে থেকে css code লেখা আছে, সেগুলা ক্লিয়ার করতে হবে।
+
+
+
+
+
+
+
+
+
+05. => Tailwind with Vue.js:
+----------------------------
+05. i) Vue.js Project Creation:
+Command: npm create vite@latest demo-vue
+
+Then, select a framework: Vue
+Then, select a variant: TypeScript
+Then, install with nmp and start now?: Yes
+Then, Project directory: cd demo-vue
+
+
+05. ii) Tailwind CSS and Vite Install:
+--------------------------------------
+Command: npm install tailwindcss @tailwindcss/vite
+
+Then, Import Tailwind CSS and enable it
+Edit vite.config.ts:
+---------------------
+import tailwindcss from '@tailwindcss/vite'
+import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [vue(), tailwindcss()],
+})
+
+
+Then Import Tailwind CSS; edit src/style.css:
+----------------------------------------------
+@import "tailwindcss";
+
+
+Now, Apply TailwindCSS:
+Edit src/components/HelloWorld.vue:
+------------------------------------
+<h1 class="text-red-500">Get started</h1>
+
+css কাজ করবে না, কারণ style.css এ আগে থেকে css code লেখা আছে, সেগুলা ক্লিয়ার করতে হবে।
+
+
+
+
+
+
+
+
+
+06. => Tailwind with Laravel:
+-----------------------------
+Laravel এর সাথে tailwind CSS build in
+
+
+
+
+
+
+
+
+
+07. => Text Styling with Tailwind:
+----------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
