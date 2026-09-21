@@ -1,5 +1,5 @@
 TypeScript: https://www.youtube.com/watch?v=pnL9ncb66Gk
-=========== 128 Minutes
+
 
 
 
@@ -718,6 +718,13 @@ addOrder("mango")
 addOrder("lemon")
 
 console.log(orders)
+
+
+
+
+
+
+
 
 
 

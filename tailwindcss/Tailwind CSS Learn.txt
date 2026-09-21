@@ -1,6 +1,6 @@
 Complete Tailwind CSS Crash Course in Bangla: https://www.youtube.com/watch?v=x6XFmB5fjZM
 ============================================
-16 Minutes
+2 hours and 25 Minutes
 
 01. => Using Tailwind CSS from CDN:
 ------------------------------------
@@ -201,8 +201,275 @@ Laravel এর সাথে tailwind CSS build in
 
 
 
-07. => Text Styling with Tailwind:
+07. => Typography with Tailwind:
+--------------------------------
+Install Command: npm install -D @tailwindcss/typography
+
+Set Typography to edit src/input.css:
+--------------------------------------
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+Then, Command: npm run build/npm run build:watch
+
+Edit index.html use prose, line-clamp:
+---------------------------------------
+    <article class="prose mx-auto">
+      <time>Mar 10, 2020</time>
+      <h2>Boost your conversion rate</h2>
+      <p class="line-clamp-3">
+        Nulla dolor velit adipisicing duis excepteur esse in duis nostrud occaecat mollit incididunt deserunt sunt. Ut ut
+        sunt laborum ex occaecat eu tempor labore enim adipisicing minim ad. Est in quis eu dolore occaecat excepteur fugiat
+        dolore nisi aliqua fugiat enim ut cillum. Labore enim duis nostrud eu. Est ut eiusmod consequat irure quis deserunt
+        ex. Enim laboris dolor magna pariatur. Dolor et ad sint voluptate sunt elit mollit officia ad enim sit consectetur
+        enim.
+      </p>
+      <div>
+        <img src="/img/lindsay.jpg" />
+        Lindsay Walton
+      </div>
+    </article>
+
+
+
+
+
+
+
+
+
+08. => Gradients:
+-----------------
+Box Linear use:
+------------------
+bg-linear-to-r from-indigo-500 to-emerald-500
+bg-linear-to-r from-indigo-500 via-sky-500 to-emerald-500
+bg-linear-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%
+
+
+Text Linear use:
+-------------------
+bg-clip-text text transparent bg-linear-to-r from-indigo-500 to-emerald-500
+bg-clip-text text transparent bg-linear-to-r from-amber-400 via-rose-500 to-purple-600
+
+
+Center-to-Outside Radial use:
+-----------------------------
+bd-radial from-indigo-500 to-emerald-500
+bd-radial from-indigo-500 via-sky-500 to-emerald-500
+
+Position Change:
+----------------
+bd-radial from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%
+
+
+
+
+
+
+
+
+
+09. => Light and Dark Themes in Tailwind CSS:
+---------------------------------------------
+09. i) Edit src/input.css:
+--------------------------
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@variant dark (&:where(.dark, .dark *));
+
+
+09. ii) Edit index.html:
+------------------------
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="dist/output.css" />
+  </head>
+  <body
+    class="bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center justify-center p-6"
+  >
+    <main class="space-y-6">
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight">
+        Hello, Tailwind CSS!
+      </h1>
+      <p class="text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+        Toggle between light and dark themes effortlessly.
+      </p>
+
+      <!-- Theme Switch Button -->
+      <button
+        onclick="document.documentElement.classList.toggle('dark')"
+        class="px-6 py-3 rounded-full font-semibold shadow-md bg-gray-900 text-white cursor-pointer"
+      >
+        <span class="dark:hidden">Switch Theme To Dark</span>
+        <span class="hidden dark:block">Switch Theme To Light</span>
+      </button>
+    </main>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+10. => Interaction in Tailwind CSS
 ----------------------------------
+10.1 Group hover Example: Parent div class: group and child div use: group-hover:text-orange-500
+------------------------------------------------------------------------------------------------
+ <body class="bg-slate-100 min-h-screen flex items-center justify-center p-6">
+    <div
+      class="group bg-white p-8 rounded-2xl shadow-md max-w-md w-full space-y-6"
+    >
+      <div>
+        <span
+          class="text-xs font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2.5 py-1 rounded"
+          >Example 9</span
+        >
+        <h1 class="text-2xl font-bold text-slate-800 mt-2">Hover Example</h1>
+        <p class="text-sm text-slate-500">
+          Add hover states to the links and button below.
+        </p>
+      </div>
+
+      <!-- Text Block with two inline links -->
+      <p class="text-slate-600 leading-relaxed">
+        Read the
+        <a
+          href="#"
+          class="font-bold group-hover:text-orange-500 group-hover:underline"
+          >documentation</a
+        >
+        to learn how the framework works; visit the
+        <a href="#" class="font-bold group-hover:text-emerald-500"
+          >community forum</a
+        >
+        to ask questions and share what you build.
+      </p>
+
+      <!-- Button -->
+      <div>
+        <button
+          class="bg-teal-600 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-teal-800"
+        >
+          Get Started
+        </button>
+      </div>
+    </div>
+  </body>
+
+
+
+10.2 Peer Interaction: Only CSS: use hover to show text, and click the input box to show suggestion text, and when the button is clicked or enabled, change the button color
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-6">
+    <div class="bg-white p-8 rounded-2xl shadow-md max-w-md w-full space-y-6">
+      <div>
+        <span
+          class="text-xs font-bold uppercase tracking-wider text-cyan-600 bg-cyan-50 px-2.5 py-1 rounded"
+          >Example 6</span
+        >
+        <h1 class="text-2xl font-bold text-slate-800 mt-2">Peer Interaction</h1>
+        <p class="text-sm text-slate-500">
+          Style an element based on the state of a previous
+          <strong>sibling</strong> using
+          <code class="text-cyan-600 bg-cyan-50 px-1 py-0.5 rounded">peer</code>
+          and
+          <code class="text-cyan-600 bg-cyan-50 px-1 py-0.5 rounded"
+            >peer-*</code
+          >.
+        </p>
+      </div>
+
+      <!-- 1. Peer Hover: Tooltip / Hint -->
+      <div class="space-y-3">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">
+          1. Hover Button &rarr; Show Sibling Tooltip
+        </h2>
+        <p class="text-xs text-slate-500">
+          Hovering the button reveals the adjacent helper text without
+          JavaScript:
+        </p>
+
+        <div class="relative inline-block">
+          <!-- The trigger sibling (marked with class="peer") -->
+          <button
+            class="peer bg-cyan-600 text-white font-medium px-4 py-2 rounded-lg hover:bg-cyan-700"
+          >
+            Hover for info ℹ️
+          </button>
+
+          <!-- The target sibling (reacts to peer hover) -->
+          <div
+            class="hidden peer-hover:block absolute left-full top-1/2 -translate-y-1/2 ml-3 whitespace-nowrap bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg"
+          >
+            I am a sibling tooltip!
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Peer Focus: Floating Label / Input Helper -->
+      <div class="space-y-3">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">
+          2. Focus Input &rarr; Change Sibling Label & Helper
+        </h2>
+        <p class="text-xs text-slate-500">
+          Clicking/focusing the input highlights the label and reveals guidance:
+        </p>
+
+        <div class="space-y-1">
+          <!-- Input with class="peer" -->
+          <input
+            type="password"
+            placeholder="Enter a secure password..."
+            class="peer w-full px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-800 focus:outline-none focus:border-cyan-500"
+          />
+
+          <!-- Sibling helper text revealed ONLY on peer-focus -->
+          <p
+            class="hidden peer-focus:block text-xs text-cyan-600 font-medium transition-all"
+          >
+            🔒 Must be at least 8 characters long with 1 number.
+          </p>
+        </div>
+      </div>
+
+      <!-- 3. Peer Checked: Toggle Switch / Checkbox -->
+      <div class="space-y-3">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">
+          3. Checkbox &rarr; Style Sibling Switch
+        </h2>
+        <p class="text-xs text-slate-500">
+          Clicking the toggle checks the hidden input and animates the sibling
+          slider:
+        </p>
+
+        <label
+          class="inline-flex items-center gap-3 cursor-pointer select-none"
+        >
+          <!-- Hidden checkbox with class="peer" -->
+          <input type="checkbox" class="sr-only peer" />
+
+          <!-- Sibling switch track -->
+          <div
+            class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:bg-cyan-600 transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"
+          ></div>
+
+          <span
+            class="text-sm font-medium text-slate-700 peer-checked:text-cyan-700"
+            >Enable Notifications</span
+          >
+        </label>
+      </div>
+    </div>
+  </body>
 
 
 
@@ -212,6 +479,157 @@ Laravel এর সাথে tailwind CSS build in
 
 
 
+11. => Flexbox Layouts in TailwindCSS:
+--------------------------------------
+11.1) Menubar Horizontally Center:
+---------------------------------
+Parent Div Used:
+---------------
+Flex gap-4 দিলে মেনুগুলার মধ্য gap তৈরি হবে। h-20 items-center দিলে ২০ হাইটের মাঝে থাকবে, আর justify-center দিলে horizontally মাঝে চলে আসবে।
+
+Example:
+-------
+<body class="min-h-screen bg-slate-950 px-6 py-12 font-sans text-white">
+    <main class="mx-auto max-w-5xl">
+      <section>
+        <div
+          class="rounded-2xl flex gap-4 h-20 items-center justify-center border border-slate-800 bg-slate-900 px-6 py-4 text-sm font-medium"
+        >
+          <a href="#" class="text-white">Home</a>
+          <a href="#" class="text-slate-300 transition hover:text-sky-400"
+            >Features</a
+          >
+          <a href="#" class="text-slate-300 transition hover:text-sky-400"
+            >Pricing</a
+          >
+          <a href="#" class="text-slate-300 transition hover:text-sky-400"
+            >Docs</a
+          >
+          <a href="#" class="text-slate-300 transition hover:text-sky-400"
+            >About</a
+          >
+          <a href="#" class="text-slate-300 transition hover:text-sky-400"
+            >Contact</a
+          >
+        </div>
+      </section>
+    </main>
+  </body>
+
+
+
+11.2) Menubar Vertical:
+-----------------------
+Just Parent Div: flex gap-4 flex-col
+
+
+
+
+11.3) Any Child Div Position in Flex:
+-------------------------------------
+Horizontally Center: flex justify-center
+Example:
+---------
+    <main class="mx-auto max-w-5xl">
+      <section>
+        <div
+          class="flex justify-center h-72 rounded-2xl border border-slate-800 bg-slate-900 p-4"
+        >
+          <div
+            class="h-20 w-20 rounded-2xl bg-sky-400 text-2xl font-bold text-slate-950"
+          >
+            F
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+
+
+
+11.4) Vertically Center: flex items-center
+-----------------------
+
+
+11.5) Horizontally & Vertically Center: flex items-center justify-center
+--------------------------------------
+
+
+11.6) Horizontally ডান পাশেঃ flex justify-end
+----------------------------
+
+11.7) Horizontall & Verticall ডানে নিচেঃ flex justify-end items-end
+----------------------------------------
+
+11.8) Justify Between Example Logo & Menu:
+------------------------------------------
+<body class="min-h-screen bg-slate-950 px-6 py-12 font-sans text-white">
+    <main class="mx-auto max-w-5xl">
+      <section>
+        <div
+          class="flex justify-between h-20 gap-4 items-center rounded-2xl border border-slate-800 bg-slate-900 px-6"
+        >
+          <a href="#" class="flex items-center gap-2 text-white">
+            <span
+              class="grid h-8 w-8 place-items-center rounded-lg bg-sky-400 text-slate-950 font-bold"
+              >L</span
+            >
+            <span class="font-semibold tracking-tight">Logo</span>
+          </a>
+          <div class="flex gap-4">
+            <a href="#" class="text-white">Home</a>
+            <a href="#" class="text-slate-300 transition hover:text-sky-400"
+              >Features</a
+            >
+            <a href="#" class="text-slate-300 transition hover:text-sky-400"
+              >Pricing</a
+            >
+            <a href="#" class="text-slate-300 transition hover:text-sky-400"
+              >Docs</a
+            >
+            <a href="#" class="text-slate-300 transition hover:text-sky-400"
+              >About</a
+            >
+            <a href="#" class="text-slate-300 transition hover:text-sky-400"
+              >Contact</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+
+
+
+
+11.9) Header, Sidebar, Main content, Footer:
+---------------------------------------------
+<body class="h-screen bg-slate-950 font-sans text-white">
+    <div class="flex h-full flex-col bg-slate-900">
+      <!-- Header -->
+      <header
+        class="flex items-center justify-between bg-sky-400 px-6 py-4 font-bold text-slate-950"
+      >
+        <span>Header</span>
+        <span class="text-sm font-medium opacity-70">flex row</span>
+      </header>
+
+      <!-- Sidebar + Main Content -->
+      <div class="flex flex-1">
+        <aside class="w-48 bg-violet-400 p-4 font-bold text-slate-950">
+          Sidebar
+        </aside>
+        <main class="flex-1 bg-emerald-400 p-4 font-bold text-slate-950">
+          Main Content
+        </main>
+      </div>
+
+      <!-- Footer -->
+      <footer class="bg-slate-600 px-6 py-4 font-bold text-slate-100">
+        Footer
+      </footer>
+    </div>
+  </body>
 
 
 
@@ -221,13 +639,74 @@ Laravel এর সাথে tailwind CSS build in
 
 
 
+12. => Grid in Tailwind CSS:
+-----------------------------
+12.1) Parent Div used grid: grid grid-cols-6 gap-3
+---------------------------
+  <body class="min-h-screen bg-slate-950 px-6 py-12 font-sans text-white">
+    <main class="mx-auto max-w-5xl">
+      <div class="grid grid-cols-6 gap-3">
+        <div class="bg-sky-400 p-6 text-slate-950">1</div>
+        <div class="bg-sky-400 p-6 text-slate-950">2</div>
+        <div class="bg-sky-400 p-6 text-slate-950">3</div>
+        <div class="bg-sky-400 p-6 text-slate-950">3</div>
+        <div class="bg-sky-400 p-6 text-slate-950 col-span-2">3</div>
+      </div>
+    </main>
+  </body>
+
+
+
+12.2 Fraction in Grid:
+----------------------
+6 grid এর ডিভকে ৩টা ডিভে জায়গা দিতে, প্রথমটি তার নির্দিষ্ট জায়গা নিবে, পরের টা ৩গুন জায়গা নিবে আর ৩য়টা ২গুন জায়গা নিবে
+Example: grid grid-cols-[1fr_3fr_2fr] gap-3
+--------
+  <body class="min-h-screen bg-slate-950 px-6 py-12 font-sans text-white">
+    <main class="mx-auto max-w-5xl">
+      <div class="grid grid-cols-[1fr_3fr_2fr] gap-3">
+        <div class="bg-sky-400 p-6 text-slate-950">1</div>
+        <div class="bg-sky-400 p-6 text-slate-950">2</div>
+        <div class="bg-sky-400 p-6 text-slate-950">3</div>
+      </div>
+    </main>
+  </body>
+
+
+
+12.3) Positioning in Grid: 
+---------------------------
+Horizontall & Verticall Center: place-items-center grid
+--------------------------------
+<body class="min-h-screen bg-slate-950 px-6 py-12 font-sans text-white">
+    <main class="mx-auto max-w-5xl">
+      <section>
+        <div
+          class="place-items-center grid h-72 rounded-2xl border border-slate-800 bg-slate-900 p-4"
+        >
+          <div
+            class="h-20 w-20 grid place-items-center rounded-2xl bg-sky-400 text-2xl font-bold text-slate-950"
+          >
+            G
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+
+
+12.4) Horizontally Center: justify-items-center grid
+--------------------------
+
+
+12.5) Horizontally Center & Vertically Center: justify-items-center items-center grid
+----------------------------------------------
 
 
 
 
-
-
-
-
-
+13. => BreakPoints:
+--------------------
+Active breakpoint   ≥640px sm   ≥768px md   ≥1024px lg   ≥1280px xl   ≥1536px 2xl
+Example: 769px এটা md, 1023px md
 
