@@ -1,0 +1,19 @@
+1. public_html/ ফোল্ডারের ভেতরে symlink.php নামে একটি ফাইল তৈরি করুন।
+2. সেখানে থাকা storage ফোল্ডারটিকে ম্যানুয়ালি ডিলিট (Delete) করে দিন।
+3. ফাইলে নিচের কোডটি লিখুন:
+<?php
+$targetFolder = '/home/larasoft/larasoftbd_app/storage/app/public';
+$linkFolder = '/home/larasoft/public_html/storage';
+
+if (file_exists($linkFolder)) {
+    unlink($linkFolder); // পুরনো ফোল্ডার/লিংক থাকলে ডিলিট করবে
+}
+
+if (symlink($targetFolder, $linkFolder)) {
+    echo 'Symlink process completed successfully!';
+} else {
+    echo 'Symlink process failed!';
+}
+
+4. ব্রাউজারে গিয়ে ভিজিট করুন: [https://larasoftbd.xyz/symlink.php](https://larasoftbd.xyz/symlink.php)
+5. "Symlink process completed successfully!" মেসেজ আসলে symlink.php ফাইলটি ডিলিট করে দিন।
